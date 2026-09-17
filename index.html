@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Portal Akses</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #1f2933 0%, #3a4a58 100%);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  }
+  .card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 360px;
+    margin: 16px;
+    padding: 32px 28px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .card h1 {
+    font-size: 18px;
+    margin: 0 0 4px 0;
+    color: #1f2933;
+    text-align: center;
+  }
+  .card p.sub {
+    margin: 0 0 24px 0;
+    text-align: center;
+    color: #7b8794;
+    font-size: 13px;
+  }
+  label {
+    display: block;
+    font-size: 13px;
+    color: #3a4a58;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  input[type=text], input[type=password] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    border: 1px solid #cbd2d9;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  input[type=text]:focus, input[type=password]:focus {
+    outline: none;
+    border-color: #3a4a58;
+  }
+  button {
+    width: 100%;
+    padding: 11px;
+    background: #1f2933;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  button:hover { background: #323f4b; }
+  .error {
+    display: none;
+    background: #fde8e8;
+    color: #9b1c1c;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Portal Akses Internal</h1>
+    <p class="sub">Masukkan ID dan Password untuk melanjutkan</p>
+    <div class="error" id="errBox">ID atau Password salah.</div>
+    <form id="loginForm" autocomplete="off">
+      <label for="uid">ID</label>
+      <input type="text" id="uid" name="uid" autocomplete="username" required>
+      <label for="pwd">Password</label>
+      <input type="password" id="pwd" name="pwd" autocomplete="current-password" required>
+      <button type="submit">Masuk</button>
+    </form>
+  </div>
+
+<script>
+// Hash SHA-256 dari string "id:password" untuk tiap akun.
+// Password asli TIDAK disimpan dalam bentuk teks biasa di file ini.
+var ACCOUNTS = [
+  { hash: 'c3b554f1d2a1c3543090af266857e8ef25b01c566b432a59544136b6dc1df63b', role: 'admin', dest: 'console.html' },
+  { hash: '98444522ad2fbe503a71e433d9d9af979c6c197dd6254737191627c0eaac3638', role: 'user',  dest: 'view.html' }
+];
+
+async function sha256Hex(message) {
+  var enc = new TextEncoder().encode(message);
+  var digest = await crypto.subtle.digest('SHA-256', enc);
+  var bytes = Array.from(new Uint8Array(digest));
+  return bytes.map(function(b){ return b.toString(16).padStart(2, '0'); }).join('');
+}
+
+document.getElementById('loginForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  var uid = document.getElementById('uid').value.trim();
+  var pwd = document.getElementById('pwd').value;
+  var errBox = document.getElementById('errBox');
+  errBox.style.display = 'none';
+
+  try {
+    var combined = uid + ':' + pwd;
+    var hash = await sha256Hex(combined);
+    var match = ACCOUNTS.find(function(acc){ return acc.hash === hash; });
+
+    if (match) {
+      sessionStorage.setItem('kalandra09_auth', match.role === 'admin' ? 'admin_ok' : 'user_ok');
+      window.location.href = match.dest;
+    } else {
+      errBox.style.display = 'block';
+    }
+  } catch (err) {
+    errBox.textContent = 'Terjadi kesalahan pada browser. Coba gunakan Chrome/Edge/Firefox terbaru dan pastikan halaman diakses lewat https.';
+    errBox.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>
