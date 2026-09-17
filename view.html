@@ -447,6 +447,14 @@ function passesFilters(d) {
   return true;
 }
 
+// Render tampilan awal (mode = 'awal') begitu halaman dimuat -- tanpa ini peta
+// akan kosong sampai tombol mode diklik sekali.
+window.addEventListener('DOMContentLoaded', function() {
+  buildFilterButtons();
+  populateGroups();
+  addModeLayersToMap();
+});
+
 function buildFilterButtons() {
   const st = modeState[mode];
   const filterDiv = document.getElementById('filter-btns');
