@@ -344,15 +344,10 @@ loadPerizinanTagsLocal();
 
 // ── MAP ──
 const map = L.map('map').setView([-6.9, 108.5], 7);
-// Beberapa sumber tile OSM dicoba berurutan; kalau satu sumber banyak gagal (limit/down),
-// otomatis pindah ke sumber berikutnya tanpa perlu edit ulang file ini.
-// Catatan: OSM.org & mirror-nya (Wikimedia) menolak akses dari file lokal (file://) tanpa
-// Referer website yang sah -- begitu file ini dibuka lewat alamat web asli (https://), biasanya
-// langsung lolos. Wikimedia dicoba dulu (paling detail/mirip OSM asli), lalu CARTO, lalu Esri
-// sebagai cadangan terakhir kalau semua bermasalah.
+// Sumber tile: OpenStreetMap resmi (utama), dengan Esri sebagai cadangan
+// otomatis kalau OSM sedang bermasalah -- tidak perlu edit ulang file ini.
 const TILE_PROVIDERS = [
-  { url: 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors, Style: Wikimedia' },
-  { url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', attribution: '&copy; OpenStreetMap contributors &copy; <a href="https://carto.com/attributions">CARTO</a>', subdomains: 'abcd' },
+  { url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png', attribution: '&copy; OpenStreetMap contributors' },
   { url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', attribution: 'Tiles &copy; Esri' }
 ];
 let _tileLayer = null, _tileErrCount = 0;
